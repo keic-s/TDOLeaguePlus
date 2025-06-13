@@ -9,6 +9,12 @@ body.tdo-league-enhanced {
   padding: 20px;
 }
 
+body.tdo-league-enhanced .tdo-league-heading {
+  background-color: #f0f8ff;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
 /* 表用のフォントはモノスペースにして数字を整える */
 table.tdo-league-table {
   font-family: 'Roboto Mono', monospace;
