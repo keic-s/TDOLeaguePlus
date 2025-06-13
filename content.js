@@ -1,34 +1,56 @@
 // contents.js
 
 window.addEventListener('load', () => {
-  try {
-    // 全テーブル取得
-    const tables = document.querySelectorAll('table');
+  document.body.classList.add('tdo-league-enhanced');
 
-    tables.forEach((table) => {
-      table.classList.add('tdo-league-table');
+  const headingPattern = /^Division\s+[A-Z]+\s*\(.+\)$/;
 
-      // 各行をチェック
-      const rows = table.querySelectorAll('tr');
+  const rows = Array.from(document.querySelectorAll('table tr'));
+  rows.forEach((tr, i) => {
+    const cellText = tr.textContent.trim();
+    if (headingPattern.test(cellText)) {
+      // 見出し検出
+      const heading = cellText;
+      const parent = tr.closest('table').parentNode;
 
-      rows.forEach((row) => {
-        const text = row.innerText.trim();
+      // <h2>見出し
+      const h2 = document.createElement('h2');
+      h2.className = 'tdo-league-heading';
+      h2.textContent = heading;
 
-        // 特定のキーワードで見出し行と判定（必要に応じて調整可能）
-        if (
-          /Class\s+[A-Z]/i.test(text) ||
-          /Division\s+[A-Z]+\s*\(?\p{Script=Han}*\)?/iu.test(text)  // Division AA（水）など
-        ) {
-          row.classList.add('tdo-league-heading');
-        }
-      });
-    });
+      // データ行取得（見出し行の次から、空行または別見出しまで）
+      const dataRows = [];
+      let j = i + 1;
+      while (j < rows.length) {
+        const txt = rows[j].textContent.trim();
+        if (!txt || headingPattern.test(txt)) break;
+        dataRows.push(rows[j]);
+        j++;
+      }
 
-    // bodyにも共通クラスを追加
-    document.body.classList.add('tdo-league-enhanced');
+      if (dataRows.length > 0) {
+        // 新テーブル作成
+        const tbl = document.createElement('table');
+        tbl.className = 'tdo-league-table';
 
-    console.log(`[TDO Extension] ${tables.length} tables processed`);
-  } catch (error) {
-    console.error('[TDO Extension] Error in contents.js:', error);
-  }
+        dataRows.forEach((dataTr, di) => {
+          const newTr = document.createElement('tr');
+          dataTr.querySelectorAll('td').forEach(td => {
+            const newCell = document.createElement(di === 0 ? 'th' : 'td');
+            newCell.textContent = td.textContent.trim();
+            newTr.appendChild(newCell);
+          });
+          tbl.appendChild(newTr);
+        });
+
+        // 挿入
+        parent.insertBefore(h2, tr);
+        parent.insertBefore(tbl, dataRows[0]);
+      }
+
+      // 元の行を削除
+      tr.remove();
+      dataRows.forEach(r => r.remove());
+    }
+  });
 });
