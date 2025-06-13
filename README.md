@@ -1,0 +1,2 @@
+# TDOLeaguePlus
+TDOのWebページをリッチに表示するChrome拡張
